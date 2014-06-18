@@ -41,7 +41,7 @@ trello = new Trello(TRELLO_API_KEY, TRELLO_WRITE_ACCESS_TOKEN)
 jira = new JiraApi('https', JIRA_HOST, 443, JIRA_USERNAME, JIRA_PASSWORD, '2')
 
 findIssuePage = (startAt, maxResults, acc, callback) ->
-  jira.searchJira "project=#{JIRA_PROJECT}", {startAt, maxResults}, (err, results) ->
+  jira.searchJira "project=#{JIRA_PROJECT} and status in ('Closed', 'Resolved')", {startAt, maxResults}, (err, results) ->
     if err
       callback(err)
     else
@@ -54,20 +54,11 @@ findIssuePage = (startAt, maxResults, acc, callback) ->
 findAllIssues = (callback) ->
   findIssuePage(0, 1000, [], callback)
 
-findAllCards = (callback) ->
-  trello.get "/1/boards/#{TRELLO_BOARD_ID}/cards/all", callback
-
 cardName = (issue) ->
   "[#{issue.key}] (#{issue.fields.status.name}) #{issue.fields.summary}"
 
 cardDesc = (issue) ->
   "https://#{JIRA_HOST}/browse/#{issue.key}\n\n#{issue.fields.description}"
-
-updateCard = (card, issue, callback) ->
-  payload =
-    name: cardName(issue)
-    desc: cardDesc(issue)
-  trello.put "/1/cards/#{card.id}", payload, callback
 
 createCard = (issue, callback) ->
   payload =
@@ -79,15 +70,12 @@ createCard = (issue, callback) ->
     urlSource: null
   trello.post '/1/cards', payload, callback
 
-createOrUpdateCard = (allCards, issue, callback) ->
-  re = new RegExp("^\\[#{issue.key}\\]")
-  card = _.find allCards, (it) -> re.test(it.name)
-  if card
-    updateCard(card, issue, callback)
-  else
-    createCard(issue, callback)
+archiveCard = (card, callback) ->
+  trello.put "/1/cards/#{card.id}/closed", {value:true}, callback
 
-async.parallel {issues:findAllIssues, cards:findAllCards}, (err, {issues, cards}) ->
+createThenArchive = async.compose(archiveCard, createCard)
+
+findAllIssues (err, issues) ->
   throw err if err
-  async.each issues, async.apply(createOrUpdateCard, cards), (err) ->
-    throw err if err
+  for issue in issues
+    createThenArchive(issue, ->)

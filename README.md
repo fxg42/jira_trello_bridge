@@ -4,8 +4,8 @@ A script that synchronizes jira issues to a trello board.
 
 ### jira
 
-Setting up the jira access is requires that the `JIRA_USERNAME` and
-`JIRA_PASSWORD` environment variables be setup.
+Setting up the jira access requires that the `JIRA_USERNAME` and
+`JIRA_PASSWORD` environment variables be set up.
 
 ### trello
 
@@ -38,8 +38,8 @@ Use the chosen board and list id when running the command.
 Because the project management workflow and the debugging workflow aren't the
 same, closing or resolving an issue in jira will not automatically archive the
 corresponding trello card. However, when importing an existing jira project for
-the first time, archiving all closed issues is time consuming. A seperate script
-can be used to import only 'closed' and 'resolved' issues in trello and archive
+the first time, archiving all closed issues can be quite time consuming. A separate script
+can be used to import only 'closed' and 'resolved' issues as trello cards and archive
 them immediately.
 
     $ coffee import_closed.coffee \

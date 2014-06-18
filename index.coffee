@@ -38,7 +38,7 @@ JIRA_HOST = program.jira_host
 JIRA_PROJECT = program.jira_project
 
 trello = new Trello(TRELLO_API_KEY, TRELLO_WRITE_ACCESS_TOKEN)
-jira = new JiraApi 'https', JIRA_HOST, 443, JIRA_USERNAME, JIRA_PASSWORD, '2'
+jira = new JiraApi('https', JIRA_HOST, 443, JIRA_USERNAME, JIRA_PASSWORD, '2')
 
 findIssuePage = (startAt, maxResults, acc, callback) ->
   jira.searchJira "project=#{JIRA_PROJECT}", {startAt, maxResults}, (err, results) ->

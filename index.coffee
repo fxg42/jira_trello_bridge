@@ -38,10 +38,21 @@ JIRA_HOST = program.jira_host
 JIRA_PROJECT = program.jira_project
 
 trello = new Trello(TRELLO_API_KEY, TRELLO_WRITE_ACCESS_TOKEN)
+jira = new JiraApi 'https', JIRA_HOST, 443, JIRA_USERNAME, JIRA_PASSWORD, '2'
+
+findIssuePage = (startAt, maxResults, acc, callback) ->
+  jira.searchJira "project=#{JIRA_PROJECT}", {startAt, maxResults}, (err, results) ->
+    if err
+      callback(err)
+    else
+      issues = acc.concat(results.issues)
+      if issues.length < results.total
+        findIssuePage(results.startAt + results.maxResults, maxResults, issues, callback)
+      else
+        callback(null, issues)
 
 findAllIssues = (callback) ->
-  jira = new JiraApi 'https', JIRA_HOST, 443, JIRA_USERNAME, JIRA_PASSWORD, '2'
-  jira.searchJira "project=#{JIRA_PROJECT}", {maxResults:1000}, callback
+  findIssuePage(0, 1000, [], callback)
 
 findAllCards = (callback) ->
   trello.get "/1/boards/#{TRELLO_BOARD_ID}/cards/all", callback
@@ -78,5 +89,5 @@ createOrUpdateCard = (allCards, issue, callback) ->
 
 async.parallel {issues:findAllIssues, cards:findAllCards}, (err, {issues, cards}) ->
   throw err if err
-  async.each issues.issues, async.apply(createOrUpdateCard, cards), (err) ->
+  async.each issues, async.apply(createOrUpdateCard, cards), (err) ->
     throw err if err

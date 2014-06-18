@@ -33,6 +33,21 @@ ids:
 
 Use the chosen board and list id when running the command.
 
+## Importing closed and resolved issues
+
+Because the project management workflow and the debugging workflow aren't the
+same, closing or resolving an issue in jira will not automatically archive the
+corresponding trello card. However, when importing an existing jira project for
+the first time, archiving all closed issues is time consuming. A seperate script
+can be used to import only 'closed' and 'resolved' issues in trello and archive
+them immediately.
+
+    $ coffee import_closed.coffee \
+          -b CHOSEN_TRELLO_BOARD_ID \
+          -l CHOSEN_TRELLO_LIST_ID \
+          -h JIRA_HOST (e.g. mycompagny.atlassian.net) \
+          -p JIRA_PROJECT_KEY (e.g. ABC)
+
 ## Running the command
 
     $ coffee index.coffee \

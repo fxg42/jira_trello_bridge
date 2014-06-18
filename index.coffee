@@ -77,6 +77,7 @@ createCard = (issue, callback) ->
     idList: TRELLO_NEW_ISSUES_LIST_ID
     due: null
     urlSource: null
+    pos: 'top'
   trello.post '/1/cards', payload, callback
 
 createOrUpdateCard = (allCards, issue, callback) ->

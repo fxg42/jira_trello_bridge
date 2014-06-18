@@ -41,7 +41,7 @@ trello = new Trello(TRELLO_API_KEY, TRELLO_WRITE_ACCESS_TOKEN)
 
 findAllIssues = (callback) ->
   jira = new JiraApi 'https', JIRA_HOST, 443, JIRA_USERNAME, JIRA_PASSWORD, '2'
-  jira.searchJira "project=#{JIRA_PROJECT}", {maxResults:3}, callback
+  jira.searchJira "project=#{JIRA_PROJECT}", {maxResults:1000}, callback
 
 findAllCards = (callback) ->
   trello.get "/1/boards/#{TRELLO_BOARD_ID}/cards/all", callback
